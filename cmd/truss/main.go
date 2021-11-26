@@ -26,7 +26,10 @@ import (
 )
 
 var (
-	svcPackageFlag = flag.String("svcout", "", "Go package path where the generated Go service will be written. Trailing slash will create a NAME-service directory")
+	pbPackageFlag  = flag.String("pbpkg", "", "pb Package path")
+	svcPackageFlag = flag.String("svcpkg", "", "Go package path")
+	svcOutFlag     = flag.String("svcout", "", "Go package path where the generated Go service will be written. Trailing slash will create a NAME-service directory")
+
 	verboseFlag    = flag.BoolP("verbose", "v", false, "Verbose output")
 	helpFlag       = flag.BoolP("help", "h", false, "Print usage")
 	getStartedFlag = flag.BoolP("getstarted", "", false, "Output a 'getstarted.proto' protobuf file in ./")
@@ -157,6 +160,9 @@ func parseInput() (*truss.Config, error) {
 	}
 
 	cfg.PBPackage = p[0].PkgPath
+	if *pbPackageFlag != "" {
+		cfg.PBPackage = *pbPackageFlag
+	}
 	cfg.PBPath = protoDir
 	log.WithField("PB Package", cfg.PBPackage).Debug()
 	log.WithField("PB Path", cfg.PBPath).Debug()
@@ -180,9 +186,9 @@ func parseInput() (*truss.Config, error) {
 
 	svcPath := filepath.Join(filepath.Dir(cfg.DefPaths[0]), svcDirName)
 
-	if *svcPackageFlag != "" {
-		svcOut := *svcPackageFlag
-		log.WithField("svcPackageFlag", svcOut).Debug()
+	if *svcOutFlag != "" {
+		svcOut := *svcOutFlag
+		log.WithField("svcOutFlag", svcOut).Debug()
 
 		// If the package flag ends in a seperator, file will be "".
 		_, file := filepath.Split(svcOut)
@@ -216,6 +222,10 @@ func parseInput() (*truss.Config, error) {
 	log.WithField("Service Packages", p).Debug()
 
 	cfg.ServicePackage = p[0].PkgPath
+
+	if *svcPackageFlag != "" {
+		cfg.ServicePackage = *svcPackageFlag
+	}
 	cfg.ServicePath = svcPath
 
 	log.WithField("Service Package", cfg.ServicePackage).Debug()
